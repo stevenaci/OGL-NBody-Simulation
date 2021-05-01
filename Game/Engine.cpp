@@ -43,7 +43,7 @@ void Engine::update()
     elapsed = glutGet(GLUT_ELAPSED_TIME);
     deltaTime = elapsed - prev_elapsed;
     prev_elapsed = elapsed;
-    dynamicsWorld->stepSimulation(1.f / 60.f);
+    dynamicsWorld->stepSimulation(1.f / 30.f);
 
     ////print positions of all objects
     //for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j >= 0; j--)
@@ -67,7 +67,7 @@ void Engine::render()
 {
 }
 
-btRigidBody* Engine::createSphere(float sx, float px, float py, float pz, float mass)
+btRigidBody* Engine::createSphere(float sx, float px, float py, float pz, float mass) // Create a sphere with dynamic physics
 {
     btCollisionShape* colShape = new btSphereShape(btScalar(sx));
     collisionShapes.push_back(colShape);
@@ -92,6 +92,33 @@ btRigidBody* Engine::createSphere(float sx, float px, float py, float pz, float 
 
 
     body->setWorldTransform(startTransform);
+    dynamicsWorld->addRigidBody(body);
+    return body;
+}
+
+btRigidBody* Engine::createGround(btVector3 pos, btVector3 shape)
+{
+    btCollisionShape* groundShape = new btBoxShape(shape);
+    Engine::Instance()->collisionShapes.push_back(groundShape);
+    btTransform groundTransform;
+    groundTransform.setIdentity();
+    groundTransform.setOrigin(pos);
+
+    btScalar mass(0.);
+
+    //rigidbody is dynamic if and only if mass is non zero, otherwise static
+    bool isDynamic = (mass != 0.f);
+
+    btVector3 localInertia(0, 0, 0);
+    if (isDynamic)
+        groundShape->calculateLocalInertia(mass, localInertia);
+
+    //using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
+    btDefaultMotionState* motionState = new btDefaultMotionState(groundTransform);
+    btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, motionState, groundShape, localInertia);
+    btRigidBody* body = new btRigidBody(rbInfo);
+
+    //add the body to the dynamics world
     dynamicsWorld->addRigidBody(body);
     return body;
 }

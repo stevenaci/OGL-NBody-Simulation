@@ -25,7 +25,8 @@ public:
 	void display();
 	void update();
 	void render();
-	btRigidBody* createSphere(float sx, float px, float py, float pz, float mass);
+	btRigidBody* createSphere(float sx, float px, float py, float pz, float mass); // Create a dynamic sphere
+	btRigidBody* createGround(btVector3 pos, btVector3 shape); // Create a static rectangle
 	void quit();
 	btDiscreteDynamicsWorld* getWorld() { return dynamicsWorld; }
 	static Engine* Instance();

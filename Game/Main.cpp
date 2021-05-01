@@ -57,51 +57,10 @@ void mouse_motion(int x, int y)
     //std::cout << "Mouse update";
 }
 
-// A ball.  A ball has a radius, a color, and bounces up and down between
-// a maximum height and the xz plane.  Therefore its x and z coordinates
-// are fixed.  It uses a lame bouncing algorithm, simply moving up or
-// down by 0.05 units at each frame.
-class Ball {
-    double radius;
-    GLfloat* color;
-
-    int direction;
-    btRigidBody* body;
-    btTransform tform;
-public:
-    Ball(double r, GLfloat* c, double x, double y, double z) :
-        radius(r), color(c), direction(-1){
-        printf("ball #created at = %f,%f,%f\n", x,y,z);
-        body = engine->createSphere(r, x, y, z, .000001);
-
-        if (body && body->getMotionState())
-        {
-            //tform = body->getCenterOfMassTransform();
-            body->getMotionState()->getWorldTransform(tform);
-        }
-    }
-    void display() {
-        if (body && body->getMotionState())
-        {
-            //tform = body->getCenterOfMassTransform();
-            body->getMotionState()->getWorldTransform(tform);
-        }
-
-        btVector3 pos = tform.getOrigin();
-        glPushMatrix();
-        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
-        glTranslated(pos.getX(), pos.getY(), pos.getZ());
-        glutSolidSphere(radius, 30, 30);
-        glPopMatrix();
-    }
-    void update() {
-
-    }
-};
 
 // Global variables: a camera, a checkerboard and some balls.
 Checkerboard checkerboard(18, 18);
-Objects::Triangles triangles(0, 0, 25);
+Triangles triangles(0, 0, 25);
 
 Ball balls[] = {
   Ball(1, GREEN, 0, 10, 10.f),
@@ -190,7 +149,8 @@ void display() {
     }
 
     checkerboard.display();
-    //checkerboard.draw();
+
+    checkerboard.draw();
     for (int i = 0; i < sizeof balls / sizeof(Ball); i++) {
         balls[i].display();
     }
@@ -200,6 +160,7 @@ void display() {
     glutSwapBuffers();
 
 }
+
 #define red {0xff, 0x00, 0x00}
 #define yellow {0xff, 0xaa, 0xaa}
 #define magenta {0xff, 0, 0xff}
