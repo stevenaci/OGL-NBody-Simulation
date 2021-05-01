@@ -12,7 +12,7 @@ public:
 	glm::vec2 oldMousePosition;
 	const glm::vec3 UP;
 
-	float movespeed = 0.1f;
+	float movespeed = 1.0f;
 	Camera();
 	void mouseUpdate(const glm::vec2& newMousePosition);
 	

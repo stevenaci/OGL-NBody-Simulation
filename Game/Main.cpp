@@ -9,23 +9,16 @@
 #include <GL/glut.h>
 #endif
 #include <cmath>
-#include "Objects.h"
+#include "Engine.h"
 #include <glm/gtx/transform.hpp>
 #include <iostream>
-#include "Engine.h"
-
+#include "Objects.h"
 #include <cstdlib>
-
+#include <deque>
+#include <vector>
 #include <bullet/btBulletDynamicsCommon.h>
 
-// Colors
-GLfloat WHITE[] = { 1, 1, 1 };
-GLfloat RED[] = { 1, 0, 0 };
-GLfloat GREEN[] = { 0, 1, 0 };
-GLfloat MAGENTA[] = { 1, 0, 1 };
-
 // Mesh
-
 
 #define WIDTH 1600
 #define HEIGHT 1200
@@ -42,7 +35,15 @@ static int tracking = 0;
 float previousx;
 float previousy;
 
-Engine engine = Engine();
+// Colors
+GLfloat WHITE[] = { 1, 1, 1 };
+GLfloat RED[] = { 1, 0, 0 };
+GLfloat GREEN[] = { 0, 1, 0 };
+GLfloat MAGENTA[] = { 1, 0, 1 };
+
+//  1. pointer :V 
+// 2. ball constructor body->getmotionstate() same transform * in obj
+Engine* engine = Engine::Instance();
 
 // Mouse Tracking
 int inwindow(int x, int y)
@@ -52,11 +53,9 @@ int inwindow(int x, int y)
 
 void mouse_motion(int x, int y)
 {
-    engine.camera->mouseUpdate(glm::vec2(x, y));
+    engine->camera->mouseUpdate(glm::vec2(x, y));
     //std::cout << "Mouse update";
 }
-
-
 
 // A ball.  A ball has a radius, a color, and bounces up and down between
 // a maximum height and the xz plane.  Therefore its x and z coordinates
@@ -65,74 +64,38 @@ void mouse_motion(int x, int y)
 class Ball {
     double radius;
     GLfloat* color;
-    double maximumHeight;
-    double x;
-    double y;
-    double z;
+
     int direction;
+    btRigidBody* body;
+    btTransform tform;
 public:
-    Ball(double r, GLfloat* c, double h, double x, double z) :
-        radius(r), color(c), maximumHeight(h), direction(-1),
-        y(h), x(x), z(z) {
+    Ball(double r, GLfloat* c, double x, double y, double z) :
+        radius(r), color(c), direction(-1){
+        printf("ball #created at = %f,%f,%f\n", x,y,z);
+        body = engine->createSphere(r, x, y, z, .000001);
+
+        if (body && body->getMotionState())
+        {
+            //tform = body->getCenterOfMassTransform();
+            body->getMotionState()->getWorldTransform(tform);
+        }
     }
-    void update() {
-        y += direction * 0.05;
-        if (y > maximumHeight) {
-            y = maximumHeight; direction = -1;
+    void display() {
+        if (body && body->getMotionState())
+        {
+            //tform = body->getCenterOfMassTransform();
+            body->getMotionState()->getWorldTransform(tform);
         }
-        else if (y < radius) {
-            y = radius; direction = 1;
-        }
+
+        btVector3 pos = tform.getOrigin();
         glPushMatrix();
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
-        glTranslated(x, y, z);
+        glTranslated(pos.getX(), pos.getY(), pos.getZ());
         glutSolidSphere(radius, 30, 30);
         glPopMatrix();
     }
-};
-
-// A checkerboard class.  A checkerboard has alternating red and white
-// squares.  The number of squares is set in the constructor.  Each square
-// is 1 x 1.  One corner of the board is (0, 0) and the board stretches out
-// along positive x and positive z.  It rests on the xz plane.  I put a
-// spotlight at (4, 3, 7).
-class Checkerboard {
-    int displayListId;
-    int width;
-    int depth;
-public:
-    Checkerboard(int width, int depth) : width(width), depth(depth) {}
-    double centerx() { return width / 2; }
-    double centerz() { return depth / 2; }
-    void create() {
-
-        displayListId = glGenLists(1);
-        glNewList(displayListId, GL_COMPILE);
-
-        GLfloat lightPosition[] = { 10, 3, 7, 1 };
-        glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-
-        glBegin(GL_QUADS);
-        glNormal3d(0, 1, 0);
-        for (int x = 0; x < width - 1; x++) {
-            for (int z = 0; z < depth - 1; z++) {
-                glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE,
-                    (x + z) % 2 == 0 ? GREEN : WHITE);
-                glVertex3d(x, 0, z);
-                glVertex3d(x + 1, 0, z);
-                glVertex3d(x + 1, 0, z + 1);
-                glVertex3d(x, 0, z + 1);
-            }
-        }
-        glEnd();
-        glEndList();
-    }
     void update() {
 
-    }
-    void draw() {
-        glCallList(displayListId);
-        //create();
     }
 };
 
@@ -140,13 +103,14 @@ public:
 Checkerboard checkerboard(18, 18);
 Objects::Triangles triangles(0, 0, 25);
 
-
 Ball balls[] = {
-  Ball(1, GREEN, 7, 6, 1),
-  Ball(1.5, MAGENTA, 6, 3, 4),
-  Ball(0.4, WHITE, 5, 1, 7)
+  Ball(1, GREEN, 0, 10, 10.f),
+  Ball(1.5, GREEN, 0, 20, 10.f),
+  Ball(0.4, WHITE, 0, 30, 10.f)
 };
 
+
+std::vector<std::unique_ptr<Rain>> rain;
 
 // Application-specific initialization: Set up global lighting parameters
 // and create display lists.
@@ -158,7 +122,6 @@ void init() {
     glMaterialf(GL_FRONT, GL_SHININESS, 30);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-
 
     checkerboard.create();
 }
@@ -182,24 +145,43 @@ GLubyte fish[] = {
   0x00, 0x11, 0x01, 0x40,
   0x00, 0x0f, 0x00, 0xe0,
 };
-void update() {
-    engine.update();
 
+int it = 0;
+void update() {
+
+    engine->update();
+
+
+    it++; // This is the rain counter
+    for (auto& r : rain)
+    {
+        r->update();
+        if (r->getLife() > r->getMaxLife())
+        {
+            r = nullptr;
+        }
+    }
+    if (it % 4 == 0) {
+        it = 0;
+        rain.push_back(std::make_unique<Rain>(100 * randomFloat(), 100 * randomFloat(), 100 * randomFloat(), MAGENTA));
+    }
+    rain.erase(std::remove(begin(rain), end(rain), nullptr),
+        end(rain));
+
+    checkerboard.update();
 }
+
 // Draws one frame, the checkerboard then the balls, from the current camera
 // position.
 void display() {
-    
+
     // Engine.display()
-    engine.display();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-    
-    gluLookAt(engine.camera->position.x, engine.camera->position.y, engine.camera->position.z,
-        engine.camera->viewDirection.x + engine.camera->position.x,
-        engine.camera->viewDirection.y + engine.camera->position.y,
-        engine.camera->viewDirection.z + engine.camera->position.z,
-        engine.camera->UP.x, engine.camera->UP.y, engine.camera->UP.z);
+    engine->display();
+    for (auto& r : rain)
+    {
+        if (r != nullptr)
+            r->display();
+    }
     // Draws the fish bitmaps
     for (int i = 0; i < 20; i++) {
         glColor3f(randomFloat() * (i + 1), randomFloat() * (i + 1), randomFloat());
@@ -207,18 +189,19 @@ void display() {
         glBitmap(27, 11, 0, 0, 0, 0, fish);
     }
 
-    checkerboard.draw();
+    checkerboard.display();
+    //checkerboard.draw();
     for (int i = 0; i < sizeof balls / sizeof(Ball); i++) {
-        balls[i].update();
+        balls[i].display();
     }
+
     triangles.draw();
     glFlush();
     glutSwapBuffers();
 
-    //std::cout << "DISPLAYING";
 }
 #define red {0xff, 0x00, 0x00}
-#define yellow {0xff, 0xff, 0x00}
+#define yellow {0xff, 0xaa, 0xaa}
 #define magenta {0xff, 0, 0xff}
 
 GLubyte texture[][3] = {
@@ -251,17 +234,17 @@ void reshape(GLint w, GLint h) {
 // Requests to draw the next frame.
 void timer(int v) {
     glutPostRedisplay();
-    glutTimerFunc(1000 / 60, timer, v);
+    glutTimerFunc(1000 / 60 * Engine::Instance()->deltaTime , timer, v);
 }
 
 // Moves the camera according to the key pressed, then ask to refresh the
 // display.
 void special(int key, int, int) {
     switch (key) {
-    case GLUT_KEY_LEFT: engine.camera->strafeLeft(); break;
-    case GLUT_KEY_RIGHT: engine.camera->strafeRight(); break;
-    case GLUT_KEY_UP: engine.camera->moveForward(); break;
-    case GLUT_KEY_DOWN: engine.camera->moveBackward(); break;
+    case GLUT_KEY_LEFT: engine->camera->strafeLeft(); break;
+    case GLUT_KEY_RIGHT: engine->camera->strafeRight(); break;
+    case GLUT_KEY_UP: engine->camera->moveForward(); break;
+    case GLUT_KEY_DOWN: engine->camera->moveBackward(); break;
     }
     glutPostRedisplay();
 }
@@ -272,8 +255,9 @@ int main(int argc, char** argv) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowPosition(80, 80);
     glutInitWindowSize(WIDTH, HEIGHT);
+
     glutCreateWindow("Bouncing Balls");
-    //glutIdleFunc(update);
+    glutIdleFunc(update);
     glutDisplayFunc(display);
     //glutMouseFunc();
     glutMotionFunc(mouse_motion);
