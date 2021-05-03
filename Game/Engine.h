@@ -1,9 +1,16 @@
 #pragma once
 #include <bullet/btBulletDynamicsCommon.h>
 #include "Camera.h"
-
+#include <GL/glew.h>
+#include <GLFW/glfw3.h> // Shader Streams
 #include <GL/glut.h>
 #include <glm/gtx/transform.hpp>
+#include <glm/glm.hpp>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+
 class Engine
 {
 
@@ -30,5 +37,6 @@ public:
 	void quit();
 	btDiscreteDynamicsWorld* getWorld() { return dynamicsWorld; }
 	static Engine* Instance();
+	GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path); 
 };
 

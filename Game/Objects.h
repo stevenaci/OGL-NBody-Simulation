@@ -55,6 +55,7 @@ public:
     void create() {
         // Creates the rendering block
         // Modern GL creates a prerendered 'glList'
+        // For static meshes
         // Colors
         GLfloat WHITE[] = { 1, 1, 1 };
         GLfloat RED[] = { 1, 0, 0 };
@@ -65,7 +66,6 @@ public:
         glNewList(displayListId, GL_COMPILE);        
         GLfloat lightPosition[] = { 10, 3, 7, 1 };
         glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-
         glBegin(GL_QUADS);
         update();
         btVector3 loc = tform.getOrigin();
