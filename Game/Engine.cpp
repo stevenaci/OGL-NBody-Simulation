@@ -1,6 +1,5 @@
 #include "Engine.h"
 using namespace glm;
-
 void Engine::init()
 {
     camera = new Camera();
