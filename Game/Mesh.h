@@ -1,8 +1,11 @@
 #pragma once
 
 #include <GL/glew.h>
+
 #include <GLFW/glfw3.h> // Shader Streams
+
 #include <GL/glut.h>
+
 #include <glm/gtx/transform.hpp>
 #include <glm/glm.hpp>
 #include <stdio.h>

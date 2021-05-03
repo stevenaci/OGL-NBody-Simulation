@@ -6,15 +6,15 @@
 #include <GL/glut.h>
 #include <glm/gtx/transform.hpp>
 #include <glm/glm.hpp>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
 #include <sstream>
+
 class Engine
 {
-
 	btDefaultCollisionConfiguration* collisionConfiguration;
 	btCollisionDispatcher* dispatcher;
 	btBroadphaseInterface* overlappingPairCache;
@@ -23,7 +23,6 @@ class Engine
 	float prev_elapsed = 0.0f;
 
 public:
-
 	float deltaTime = 0.0f;
 	btDiscreteDynamicsWorld* dynamicsWorld;
 	btAlignedObjectArray<btCollisionShape*> collisionShapes;
@@ -38,6 +37,6 @@ public:
 	void quit();
 	btDiscreteDynamicsWorld* getWorld() { return dynamicsWorld; }
 	static Engine* Instance();
-	GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path); 
+	//GLuint LoadShaders(const char* vertex_file_path, const char* fragment_file_path); 
 };
 

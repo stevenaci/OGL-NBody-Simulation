@@ -2,7 +2,7 @@
 // for the laws of Newtonian Mechanics.  There's a little spotlight to make
 // the animation interesting, and arrow keys move the camera for even more
 // fun.
-
+#include <GL/glew.h>
 #ifdef __APPLE_CC__
 #include <GLUT/glut.h>
 #else
@@ -57,10 +57,10 @@ void mouse_motion(int x, int y)
     //std::cout << "Mouse update";
 }
 
-
-// Global variables: a camera, a checkerboard and some balls.
-Checkerboard checkerboard(18, 18);
+// Global variables
+Floor checkerboard(18, 18);
 Triangles triangles(0, 0, 25);
+std::vector<std::unique_ptr<Rain>> rain;
 
 Ball balls[] = {
   Ball(1, GREEN, 0, 10, 10.f),
@@ -69,7 +69,6 @@ Ball balls[] = {
 };
 
 
-std::vector<std::unique_ptr<Rain>> rain;
 
 // Application-specific initialization: Set up global lighting parameters
 // and create display lists.
@@ -81,7 +80,6 @@ void init() {
     glMaterialf(GL_FRONT, GL_SHININESS, 30);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
-
     checkerboard.create();
 }
 // Return a random float in the range 0.0 to 1.0.
@@ -105,13 +103,13 @@ GLubyte fish[] = {
   0x00, 0x0f, 0x00, 0xe0,
 };
 
-int it = 0;
+int it = 0; // Simple seed counter for generating rain
+
 void update() {
 
     engine->update();
 
-
-    it++; // This is the rain counter
+    it++;
     for (auto& r : rain)
     {
         r->update();
@@ -124,13 +122,14 @@ void update() {
         it = 0;
         rain.push_back(std::make_unique<Rain>(100 * randomFloat(), 100 * randomFloat(), 100 * randomFloat(), MAGENTA));
     }
+    // ^ could do this up here ?
     rain.erase(std::remove(begin(rain), end(rain), nullptr),
         end(rain));
 
     checkerboard.update();
 }
 
-// Draws one frame, the checkerboard then the balls, from the current camera
+// Draws one frame of our scene from the current camera
 // position.
 void display() {
 
@@ -148,17 +147,14 @@ void display() {
         glBitmap(27, 11, 0, 0, 0, 0, fish);
     }
 
-    checkerboard.display();
-
-    checkerboard.draw();
+    //checkerboard.display(); // immediate buffering
+    checkerboard.draw(); // compiled 
     for (int i = 0; i < sizeof balls / sizeof(Ball); i++) {
         balls[i].display();
     }
-
     triangles.draw();
     glFlush();
     glutSwapBuffers();
-
 }
 
 #define red {0xff, 0x00, 0x00}
@@ -189,7 +185,6 @@ void reshape(GLint w, GLint h) {
         texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
 }
 
 // Requests to draw the next frame.
@@ -217,7 +212,7 @@ int main(int argc, char** argv) {
     glutInitWindowPosition(80, 80);
     glutInitWindowSize(WIDTH, HEIGHT);
 
-    glutCreateWindow("Bouncing Balls");
+    glutCreateWindow("Rain Room");
     glutIdleFunc(update);
     glutDisplayFunc(display);
     //glutMouseFunc();

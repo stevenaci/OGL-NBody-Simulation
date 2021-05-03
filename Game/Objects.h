@@ -3,7 +3,7 @@
 // for the laws of Newtonian Mechanics.  There's a little spotlight to make
 // the animation interesting, and arrow keys move the camera for even more
 // fun.
-
+#include <GL/glew.h>
 #ifdef __APPLE_CC__
 #include <GLUT/glut.h>
 #else
@@ -23,7 +23,7 @@
 // is 1 x 1.  One corner of the board is (0, 0) and the board stretches out
 // along positive x and positive z.  It rests on the xz plane.  I put a
 // spotlight at (4, 3, 7).
-class Checkerboard {
+class Floor {
     int displayListId;
     btTransform tform;
     int width;
@@ -34,7 +34,7 @@ class Checkerboard {
     btVector3 origin;
 
 public:
-    Checkerboard(int width, int depth) : width(width), depth(depth) {
+    Floor(int width, int depth) : width(width), depth(depth) {
 
         // position vector    
         origin = btVector3(30, -110, 5);

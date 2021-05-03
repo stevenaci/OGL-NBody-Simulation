@@ -20,7 +20,7 @@ void Rain::display()
     glPopMatrix();
 
 }
-void Checkerboard::display() {
+void Floor::display() {
 
     btVector3 pos = tform.getOrigin();
     // Set up and draw a rectangle GLmatrix
@@ -32,7 +32,7 @@ void Checkerboard::display() {
     glPopMatrix();
 }
 
-void Checkerboard::update() {
+void Floor::update() {
     if (body && body->getMotionState())
     {
         body->getMotionState()->getWorldTransform(tform);
