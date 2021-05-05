@@ -38,3 +38,9 @@ void Floor::update() {
         body->getMotionState()->getWorldTransform(tform);
     }
 }
+
+void Cube::display()
+{
+
+
+}

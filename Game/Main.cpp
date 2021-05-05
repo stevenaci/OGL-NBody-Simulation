@@ -17,7 +17,6 @@
 #include <deque>
 #include <vector>
 #include <bullet/btBulletDynamicsCommon.h>
-
 // Mesh
 
 #define WIDTH 1600
@@ -80,6 +79,9 @@ void init() {
     glMaterialf(GL_FRONT, GL_SHININESS, 30);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
+    // Accept fragment if it closer to the camera than the former one
+    glDepthFunc(GL_LESS);
+
     checkerboard.create();
 }
 // Return a random float in the range 0.0 to 1.0.
@@ -103,12 +105,15 @@ GLubyte fish[] = {
   0x00, 0x0f, 0x00, 0xe0,
 };
 
+//
 int it = 0; // Simple seed counter for generating rain
-
+//
 void update() {
 
     engine->update();
 
+
+    // Update/ Generate Rain
     it++;
     for (auto& r : rain)
     {
@@ -133,6 +138,9 @@ void update() {
 // position.
 void display() {
 
+    // Dark blue background
+    glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+
     // Engine.display()
     engine->display();
     for (auto& r : rain)
@@ -147,8 +155,8 @@ void display() {
         glBitmap(27, 11, 0, 0, 0, 0, fish);
     }
 
-    //checkerboard.display(); // immediate buffering
-    checkerboard.draw(); // compiled 
+    checkerboard.display(); // immediate buffering
+    //checkerboard.draw(); // compiled 
     for (int i = 0; i < sizeof balls / sizeof(Ball); i++) {
         balls[i].display();
     }
@@ -211,7 +219,6 @@ int main(int argc, char** argv) {
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowPosition(80, 80);
     glutInitWindowSize(WIDTH, HEIGHT);
-
     glutCreateWindow("Rain Room");
     glutIdleFunc(update);
     glutDisplayFunc(display);

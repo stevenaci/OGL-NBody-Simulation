@@ -35,33 +35,33 @@ glm::mat4 Camera::getWorldToViewMatrix() const
 void Camera::moveBackward()
 {
 
-	position -= movespeed * viewDirection;
+	position -= ms * viewDirection;
 }
 
 void Camera::strafeLeft()
 {
 	glm::vec3 strafeDirection = glm::cross(viewDirection, UP);
-	position -= movespeed * strafeDirection;
+	position -= ms * strafeDirection;
 }
 
 void Camera::strafeRight()
 {
 	glm::vec3 strafeDirection = glm::cross(viewDirection, UP);
-	position += movespeed * strafeDirection;
+	position += ms * strafeDirection;
 }
 
 void Camera::moveUp()
 {
-	position += movespeed * UP;
+	position += ms * UP;
 }
 
 void Camera::moveDown()
 {
 
-	position -= movespeed * UP;
+	position -= ms * UP;
 }
 
 void Camera::moveForward()
 {
-	position += movespeed * viewDirection;
+	position += ms * viewDirection;
 }

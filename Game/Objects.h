@@ -194,3 +194,13 @@ public:
 
     }
 };
+
+
+// Coloured Cube,
+// binding & buffers :
+// (ogl 3.1)
+class Cube {
+public:
+    Cube() {};
+    void display();
+};
