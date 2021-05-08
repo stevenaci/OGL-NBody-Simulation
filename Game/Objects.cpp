@@ -1,7 +1,6 @@
 #include "Objects.h"
 void Rain::update()
 {
-
     life += 1.0f;
 }
 
@@ -18,7 +17,6 @@ void Rain::display()
     glTranslated(pos.getX(), pos.getY(), pos.getZ());
     glutSolidSphere(r, 30, 30);
     glPopMatrix();
-
 }
 void Floor::display() {
 

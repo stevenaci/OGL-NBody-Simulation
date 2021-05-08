@@ -37,7 +37,7 @@ public:
     Floor(int width, int depth) : width(width), depth(depth) {
 
         // position vector    
-        origin = btVector3(30, -110, 5);
+        origin = btVector3(59, -110, 15);
         // shape vector
         btVector3 shape = btVector3(btScalar(width), btScalar(1.), btScalar(depth));
 
@@ -99,7 +99,7 @@ class Rain
 public:
     Rain(float x, float y, float z,
         GLfloat* c) : color(c) {
-        body = Engine::Instance()->createSphere(r, x, y, z, .000001);
+        body = Engine::Instance()->createSphere(r, x, y, z, 1.23);
 
         if (body && body->getMotionState())
         {
@@ -108,7 +108,6 @@ public:
     }
     void update();
     ~Rain() {
-
         delete body->getMotionState();
         delete body->getCollisionShape();
         Engine::Instance()->getWorld()->removeRigidBody(body);
@@ -137,7 +136,7 @@ public:
 
 	void draw() {
         // Draw a textured triangle
-        //
+        // 
         glEnable(GL_TEXTURE_2D);
         glBegin(GL_TRIANGLES);
         glTexCoord2f(0.5, 1.0);    glVertex2f(-3 - x, 3 + y);

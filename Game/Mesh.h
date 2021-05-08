@@ -23,10 +23,10 @@ using namespace std;
 class Mesh
 {
 protected:
-
 	GLuint VertexArrayID;
 	GLuint programID;
 	GLuint Texture;
+	GLuint TextureID;
 
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec2> uvs;
@@ -45,5 +45,7 @@ protected:
 public:
     static void load_obj(const char* filename, vector<glm::vec4>& vertices, vector<glm::vec3>& normals, vector<GLushort>& elements); 
 	void create();
+	void display();
+	void destroy();
 };
 

@@ -17,6 +17,7 @@
 #include <deque>
 #include <vector>
 #include <bullet/btBulletDynamicsCommon.h>
+#include "Mesh.h"
 // Mesh
 
 #define WIDTH 1600
@@ -40,8 +41,6 @@ GLfloat RED[] = { 1, 0, 0 };
 GLfloat GREEN[] = { 0, 1, 0 };
 GLfloat MAGENTA[] = { 1, 0, 1 };
 
-//  1. pointer :V 
-// 2. ball constructor body->getmotionstate() same transform * in obj
 Engine* engine = Engine::Instance();
 
 // Mouse Tracking
@@ -66,8 +65,7 @@ Ball balls[] = {
   Ball(1.5, GREEN, 0, 20, 10.f),
   Ball(0.4, WHITE, 0, 30, 10.f)
 };
-
-
+Mesh mesh = Mesh();
 
 // Application-specific initialization: Set up global lighting parameters
 // and create display lists.
@@ -81,8 +79,10 @@ void init() {
     glEnable(GL_LIGHT0);
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
-
+    //glewExperimental = GL_TRUE;
+    //glewInit();
     checkerboard.create();
+    //mesh.create();
 }
 // Return a random float in the range 0.0 to 1.0.
 GLfloat randomFloat() {
@@ -112,7 +112,6 @@ void update() {
 
     engine->update();
 
-
     // Update/ Generate Rain
     it++;
     for (auto& r : rain)
@@ -137,12 +136,12 @@ void update() {
 // Draws one frame of our scene from the current camera
 // position.
 void display() {
-
     // Dark blue background
-    glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
-
+    glClearColor(0.0f, 0.0f, 0.1f, 0.0f);
     // Engine.display()
     engine->display();
+    //mesh.display();
+
     for (auto& r : rain)
     {
         if (r != nullptr)
@@ -154,13 +153,13 @@ void display() {
         glRasterPos3f(randomFloat() * (i + 1), randomFloat() * (i + 1), 0.0);
         glBitmap(27, 11, 0, 0, 0, 0, fish);
     }
-
     checkerboard.display(); // immediate buffering
     //checkerboard.draw(); // compiled 
     for (int i = 0; i < sizeof balls / sizeof(Ball); i++) {
         balls[i].display();
     }
     triangles.draw();
+
     glFlush();
     glutSwapBuffers();
 }
