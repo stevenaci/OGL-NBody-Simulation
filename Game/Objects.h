@@ -1,8 +1,5 @@
 #pragma once
-// This application shows balls bouncing on a checkerboard, with no respect
-// for the laws of Newtonian Mechanics.  There's a little spotlight to make
-// the animation interesting, and arrow keys move the camera for even more
-// fun.
+
 #include <GL/glew.h>
 #ifdef __APPLE_CC__
 #include <GLUT/glut.h>
