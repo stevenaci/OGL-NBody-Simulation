@@ -1,17 +1,17 @@
-##Implementations of OpenGL
-##for reference 
-##& further development.
+## Implementations of OpenGL
+## for reference 
+## & further development.
 
-#Classes:
+# Classes:
 
-##Engine.cpp:
+## Engine.cpp:
 - manages 3d space
 - creates objects
 
-##Mesh.cpp:
+## Mesh.cpp:
 - load .obj
 
-##Objects.cpp:
+## Objects.cpp:
 Rain:
 - "immediate display" spheres w/ gravity
 
@@ -21,7 +21,7 @@ Floor:
 Triangles:
 - draws ethereal triangles
 
-##Main.cpp:
+## Main.cpp:
 - creates some test objects
 - handles mouse keyboard callbacks
 - viewport
