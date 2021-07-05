@@ -15,14 +15,13 @@
 #include <glm/gtx/transform.hpp>
 #include <bullet/btBulletDynamicsCommon.h>
 #include "Engine.h"
-
 #include <iostream>
 
-// A checkerboard class.  A checkerboard has alternating red and white
-// squares.  The number of squares is set in the constructor.  Each square
-// is 1 x 1.  One corner of the board is (0, 0) and the board stretches out
-// along positive x and positive z.  It rests on the xz plane.  I put a
-// spotlight at (4, 3, 7).
+struct vertex
+{
+    GLfloat x, y, z;
+};
+
 class Floor {
     int displayListId;
     btTransform tform;
@@ -30,61 +29,15 @@ class Floor {
     int depth;
     btRigidBody* body;
     GLfloat color[3];
-
     btVector3 origin;
 
 public:
-    Floor(int width, int depth) : width(width), depth(depth) {
-
-        // position vector    
-        origin = btVector3(59, -110, 15);
-        // shape vector
-        btVector3 shape = btVector3(btScalar(width), btScalar(1.), btScalar(depth));
-
-        // Add to Physics World
-        body = Engine::Instance()->createGround(origin, shape);
-
-        // Colours
-        color[0] = 0.5;
-        color[1] = 0.41;
-        color[2] = 0.1;
-
-    }
-    double centerx() { return width / 2; }
-    double centerz() { return depth / 2; }
-    void create() {
-        // Creates the rendering block
-        // Modern GL creates a prerendered 'glList'
-        // For static meshes
-        // Colors
-        GLfloat WHITE[] = { 1, 1, 1 };
-        GLfloat RED[] = { 1, 0, 0 };
-        GLfloat GREEN[] = { 0, 1, 0 };
-        GLfloat MAGENTA[] = { 1, 0, 1 };
-
-        displayListId = glGenLists(1);
-        glNewList(displayListId, GL_COMPILE);        
-        GLfloat lightPosition[] = { 10, 3, 7, 1 };
-        glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-        glBegin(GL_QUADS);
-        update();
-        btVector3 loc = tform.getOrigin();
-        glColor3d(0, 1, 1);
-        glVertex3f(loc.getX(), loc.getY() , loc.getZ());
-        glColor3d(0, 1, 1);
-        glVertex3f(loc.getX() + width, loc.getY(), loc.getZ());
-        glColor3d(0, 1, 1);
-        glVertex3f(loc.getX() + width, loc.getY(), loc.getZ() + depth);
-        glColor3d(0, 1, 1);
-        glVertex3f(loc.getX(), loc.getY(), loc.getZ() + depth );
-        glEnd();
-        glEndList();
-    }
+    Floor(int width, int depth);
+    double centerx();
+    double centerz();
+    void create();
     void update();
-
-    void draw() {
-        glCallList(displayListId);
-    }
+    void draw();
     void display();
 };
 class Rain
@@ -98,14 +51,8 @@ class Rain
 
 public:
     Rain(float x, float y, float z,
-        GLfloat* c) : color(c) {
-        body = Engine::Instance()->createSphere(r, x, y, z, 1.23);
+        GLfloat* c);
 
-        if (body && body->getMotionState())
-        {
-            body->getMotionState()->getWorldTransform(tform);
-        }
-    }
     void update();
     ~Rain() {
         delete body->getMotionState();
@@ -114,46 +61,30 @@ public:
         delete body;
     }
     void display();
-    float getLife() {
-        return life;
+    float getLife() {                 return life;    
     }
-    const float getMaxLife() {
-        return maxlife;
+    const float getMaxLife() {        return maxlife;
     }
 };
 
 class Triangles
 {
+private:
+    glm::vec3 scale;
+    vertex origin;
 
 public:
-    float x, y, z;
-
-    Triangles(float x, float y, float z) : x(x), y(y), z(z) {}
-
-    void create() {
+    Triangles(float x, float y , float z)
+    { 
+        scale = { 0.0f, 1.0f, 0.0f }; 
+        origin = { x,y,z };
+    
 
     }
+    void setPosition(glm::vec3 xyz);
+    void create() {}
 
-	void draw() {
-        // Draw a textured triangle
-        // 
-        glEnable(GL_TEXTURE_2D);
-        glBegin(GL_TRIANGLES);
-        glTexCoord2f(0.5, 1.0);    glVertex2f(-3 - x, 3 + y);
-        glTexCoord2f(0.0, 0.0);    glVertex2f(-3 - x, 0 + y);
-        glTexCoord2f(1.0, 0.0);    glVertex2f(0 - x, 0 + y);
-
-        glTexCoord2f(4, 8);        glVertex2f(3 - x, 3 + y);
-        glTexCoord2f(0.0, 0.0);    glVertex2f(0 - x, 0 + y);
-        glTexCoord2f(8, 0.0);      glVertex2f(3 - x, 0 + y);
-
-        glTexCoord2f(5, 5);        glVertex2f(0 - x, 0 + y);
-        glTexCoord2f(0.0, 0.0);    glVertex2f(-1.5 - x, -3 + y);
-        glTexCoord2f(4, 0.0);      glVertex2f(1.5 - x, -3 + y);
-        glEnd();
-        glDisable(GL_TEXTURE_2D);
-
-	}
+    void draw();
 };
 
 // A ball
@@ -195,7 +126,7 @@ public:
 };
 
 
-// Coloured Cube,
+// Textured Cube,
 // binding & buffers :
 // (ogl 3.1)
 class Cube {

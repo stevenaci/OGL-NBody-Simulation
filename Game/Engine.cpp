@@ -1,4 +1,5 @@
 #include "Engine.h"
+
 using namespace glm;
 void Engine::init()
 {
@@ -38,6 +39,7 @@ void Engine::update()
     elapsed = glutGet(GLUT_ELAPSED_TIME);
     deltaTime = elapsed - prev_elapsed;
     prev_elapsed = elapsed;
+    // Update physics objects
     dynamicsWorld->stepSimulation(1.f / 30.f);
 
 
@@ -62,6 +64,19 @@ void Engine::update()
 
 void Engine::render()
 {
+}
+
+
+void Engine::reshape(GLubyte* texture)
+{
+    glTexImage2D(GL_TEXTURE_2D,
+        0,                    // level 0
+        3,                    // use only R, G, and B components
+        2, 2,                 // texture has 2x2 texels
+        0,                    // no border
+        GL_RGB,               // texels are in RGB format
+        GL_UNSIGNED_BYTE,     // color components are unsigned bytes
+        texture);
 }
 
 btRigidBody* Engine::createSphere(float sx, float px, float py, float pz, float mass) // Create a sphere with dynamic physics

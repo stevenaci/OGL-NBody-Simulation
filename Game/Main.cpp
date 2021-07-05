@@ -43,6 +43,17 @@ GLfloat MAGENTA[] = { 1, 0, 1 };
 
 Engine* engine = Engine::Instance();
 
+// Global variables
+Floor groundfloor(18, 18);
+Triangles triangles(1, 1, 1);
+std::vector<std::unique_ptr<Rain>> rain;
+
+Ball balls[] = {
+  Ball(1, GREEN, 0, 10, 10.f),
+  Ball(1.5, GREEN, 0, 20, 10.f),
+  Ball(0.4, WHITE, 0, 30, 10.f)
+};
+Mesh mesh = Mesh();
 // Mouse Tracking
 int inwindow(int x, int y)
 {
@@ -53,19 +64,8 @@ void mouse_motion(int x, int y)
 {
     engine->camera->mouseUpdate(glm::vec2(x, y));
     //std::cout << "Mouse update";
+    triangles.setPosition(engine->camera->position);
 }
-
-// Global variables
-Floor checkerboard(18, 18);
-Triangles triangles(0, 0, 25);
-std::vector<std::unique_ptr<Rain>> rain;
-
-Ball balls[] = {
-  Ball(1, GREEN, 0, 10, 10.f),
-  Ball(1.5, GREEN, 0, 20, 10.f),
-  Ball(0.4, WHITE, 0, 30, 10.f)
-};
-Mesh mesh = Mesh();
 
 // Application-specific initialization: Set up global lighting parameters
 // and create display lists.
@@ -79,11 +79,9 @@ void init() {
     glEnable(GL_LIGHT0);
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
-    //glewExperimental = GL_TRUE;
-    //glewInit();
-    checkerboard.create();
-    //mesh.create();
+    groundfloor.create();
 }
+
 // Return a random float in the range 0.0 to 1.0.
 GLfloat randomFloat() {
     return (GLfloat)rand() / RAND_MAX;
@@ -105,9 +103,7 @@ GLubyte fish[] = {
   0x00, 0x0f, 0x00, 0xe0,
 };
 
-//
 int it = 0; // Simple seed counter for generating rain
-//
 void update() {
 
     engine->update();
@@ -126,11 +122,9 @@ void update() {
         it = 0;
         rain.push_back(std::make_unique<Rain>(100 * randomFloat(), 100 * randomFloat(), 100 * randomFloat(), MAGENTA));
     }
-    // ^ could do this up here ?
     rain.erase(std::remove(begin(rain), end(rain), nullptr),
         end(rain));
-
-    checkerboard.update();
+    groundfloor.update();
 }
 
 // Draws one frame of our scene from the current camera
@@ -153,8 +147,8 @@ void display() {
         glRasterPos3f(randomFloat() * (i + 1), randomFloat() * (i + 1), 0.0);
         glBitmap(27, 11, 0, 0, 0, 0, fish);
     }
-    checkerboard.display(); // immediate buffering
-    //checkerboard.draw(); // compiled 
+    groundfloor.display(); // immediate buffering
+    //groundfloor.draw(); // compiled 
     for (int i = 0; i < sizeof balls / sizeof(Ball); i++) {
         balls[i].display();
     }
@@ -164,14 +158,11 @@ void display() {
     glutSwapBuffers();
 }
 
-#define red {0xff, 0x00, 0x00}
-#define yellow {0xff, 0xaa, 0xaa}
-#define magenta {0xff, 0, 0xff}
-
-GLubyte texture[][3] = {
+GLubyte red_yel[][3] = {
     red, yellow,
     yellow, red,
 };
+
 // On reshape, constructs a camera that perfectly fits the window.
 void reshape(GLint w, GLint h) {
     glViewport(0, 0, w, h);
@@ -181,15 +172,8 @@ void reshape(GLint w, GLint h) {
     glMatrixMode(GL_MODELVIEW);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-    // reshape all textures?
-    glTexImage2D(GL_TEXTURE_2D,
-        0,                    // level 0
-        3,                    // use only R, G, and B components
-        2, 2,                 // texture has 2x2 texels
-        0,                    // no border
-        GL_RGB,               // texels are in RGB format
-        GL_UNSIGNED_BYTE,     // color components are unsigned bytes
-        texture);
+    // Engine has this reshape function that can be iterated to reshape a texture
+    //    engine->reshape();
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
