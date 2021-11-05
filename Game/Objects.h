@@ -39,12 +39,12 @@ public:
 };
 class Rain
 {
-    float maxlife = 500.0f;
+    float maxlife = 600.0f;
     float life = 0.0f;
     btRigidBody* body;
     btTransform tform;
     GLfloat* color;
-    float r = 1;
+    float r = 1; // radius
 
 public:
     Rain(float x, float y, float z,
@@ -74,7 +74,7 @@ public:
     Triangles(float x, float y , float z)
     { 
         scale = { 0.0f, 1.0f, 0.0f }; 
-        origin = { x,y,z };
+        origin = { x, y, z };
     
 
     }

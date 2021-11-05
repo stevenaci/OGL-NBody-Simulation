@@ -29,7 +29,7 @@ public:
 	Camera* camera;
 	Engine() { init(); }
 	void init();
-	void display();
+	void pre_display();
 	void update();
 	void render();
 	void reshape(GLubyte* texture);

@@ -37,7 +37,7 @@ Floor::Floor(int width, int depth)
     : width(width), depth(depth) {
 
     // position vector    
-    origin = btVector3(59, -110, 15);
+    origin = btVector3(0, -5, 0);
     // shape vector
     //btVector3 shape = btVector3(btScalar(width), btScalar(1.), btScalar(depth));
     btVector3 shape = btVector3(btScalar(width), btScalar(1.), btScalar(depth));

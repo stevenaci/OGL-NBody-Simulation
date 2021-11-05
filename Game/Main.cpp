@@ -120,7 +120,7 @@ void update() {
     }
     if (it % 4 == 0) {
         it = 0;
-        rain.push_back(std::make_unique<Rain>(100 * randomFloat(), 100 * randomFloat(), 100 * randomFloat(), MAGENTA));
+        rain.push_back(std::make_unique<Rain>(10 * randomFloat(), 30 * randomFloat(), 10 * randomFloat(), MAGENTA));
     }
     rain.erase(std::remove(begin(rain), end(rain), nullptr),
         end(rain));
@@ -131,24 +131,25 @@ void update() {
 // position.
 void display() {
     // Dark blue background
-    glClearColor(0.0f, 0.0f, 0.1f, 0.0f);
-    // Engine.display()
-    engine->display();
-    //mesh.display();
+    engine->pre_display();
 
     for (auto& r : rain)
     {
         if (r != nullptr)
             r->display();
     }
+
+
     // Draws the fish bitmaps
     for (int i = 0; i < 20; i++) {
         glColor3f(randomFloat() * (i + 1), randomFloat() * (i + 1), randomFloat());
         glRasterPos3f(randomFloat() * (i + 1), randomFloat() * (i + 1), 0.0);
         glBitmap(27, 11, 0, 0, 0, 0, fish);
     }
+
     groundfloor.display(); // immediate buffering
-    //groundfloor.draw(); // compiled 
+    
+                           
     for (int i = 0; i < sizeof balls / sizeof(Ball); i++) {
         balls[i].display();
     }

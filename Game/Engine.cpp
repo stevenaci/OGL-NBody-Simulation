@@ -20,10 +20,12 @@ void Engine::init()
     btAlignedObjectArray<btCollisionShape*> collisionShapes;
 }
 
-void Engine::display()
+void Engine::pre_display()
 {
     // Call before displaying individual elements
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glClearColor(0.0f, 0.0f, 0.1f, 0.0f);
     glLoadIdentity();
     // update Camera perspective
     gluLookAt(camera->position.x, camera->position.y, camera->position.z,
