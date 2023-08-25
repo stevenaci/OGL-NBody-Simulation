@@ -1,28 +1,5 @@
-## Implementations of OpenGL
-## for reference 
-## & further development.
+## OGL-NBody-Simulation
+![1](https://github.com/stevenaci/OGL-NBody-Simulation/blob/master/Game/screenshots/0.png)
+![2](https://github.com/stevenaci/OGL-NBody-Simulation/blob/master/Game/screenshots/1.png)
 
-# Classes:
-
-## Engine.cpp:
-- manages 3d space
-- creates objects
-
-## Mesh.cpp:
-- load .obj
-
-## Objects.cpp:
-Rain:
-- "immediate display" spheres w/ gravity
-
-Floor:
-- openGl glList buffering
-
-Triangles:
-- draws ethereal triangles
-
-## Main.cpp:
-- creates some test objects
-- handles mouse keyboard callbacks
-- viewport
-- rendering
+An NBody simulation, using OpenGL and Bullet 3D physics.
