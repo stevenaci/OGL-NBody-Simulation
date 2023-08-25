@@ -27,9 +27,6 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="tools\shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -56,9 +53,6 @@
     <ClInclude Include="Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="tools\shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -76,5 +70,8 @@
     <Text Include="README.md" />
     <Text Include="assets\shaders\StandardShadingFr.txt" />
     <Text Include="assets\shaders\StandardShadingVe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\suzanne.mtl" />
   </ItemGroup>
 </Project>

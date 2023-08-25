@@ -25,13 +25,13 @@ void Engine::pre_display()
     // Call before displaying individual elements
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glClearColor(0.0f, 0.0f, 0.1f, 0.0f);
+    glClearColor(0.0f, 0.1f, 0.1f, 0.0f);
     glLoadIdentity();
     // update Camera perspective
     gluLookAt(camera->position.x, camera->position.y, camera->position.z,
-        camera->viewDirection.x + camera->position.x,
-        camera->viewDirection.y + camera->position.y,
-        camera->viewDirection.z + camera->position.z,
+        float(camera->position.x) + camera->viewDirection.x,
+        float(camera->position.y) + camera->viewDirection.y,
+            float(camera->position.z) + camera->viewDirection.z,
         camera->UP.x, camera->UP.y, camera->UP.z);
 }
 
@@ -42,7 +42,7 @@ void Engine::update()
     deltaTime = elapsed - prev_elapsed;
     prev_elapsed = elapsed;
     // Update physics objects
-    dynamicsWorld->stepSimulation(1.f / 30.f);
+    dynamicsWorld->stepSimulation(1.f / 160.f);
 
 
 

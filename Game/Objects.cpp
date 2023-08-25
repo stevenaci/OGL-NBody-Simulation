@@ -3,6 +3,21 @@
 double Floor::centerx() { return width / 2; }
 double Floor::centerz() { return depth / 2; }
 
+const char* vertexShaderSource = "#version 330 core\n"
+"layout (location = 0) in vec3 aPos;\n"
+"void main()\n"
+"{\n"
+"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+"}\0";
+
+const char* fragmentShaderSource = "#version 330 core\n"
+"out vec4 FragColor;\n"
+
+"void main()\n"
+"{\n"
+"    FragColor = vec4(0.5f, 0.5f, 0.2f, 1.0f);\n"
+"}\n";
+
 Rain::Rain(float x, float y, float z, GLfloat* c) : color(c) {
     body = Engine::Instance()->createSphere(r, x, y, z, 1.23);
 
@@ -15,6 +30,7 @@ Rain::Rain(float x, float y, float z, GLfloat* c) : color(c) {
 void Rain::update()
 {
     life += 1.0f;
+
 }
 
 void Rain::display()
@@ -30,11 +46,11 @@ void Rain::display()
     glTranslated(pos.getX(), pos.getY(), pos.getZ());
     glutSolidSphere(r, 30, 30);
     glPopMatrix();
+
 }
 
 
-Floor::Floor(int width, int depth)
-    : width(width), depth(depth) {
+Floor::Floor(int width, int depth) : VBO(), VAO(), EBO(), shaderProgram(), width(width), depth(depth) {
 
     // position vector    
     origin = btVector3(0, -5, 0);
@@ -47,45 +63,72 @@ Floor::Floor(int width, int depth)
 
     // Colours
     color[0] = 0.5;
-    color[1] = 0.41;
+    color[1] = 0.71;
     color[2] = 0.1;
 
 }
 
 void Floor::draw()
 {
-    glCallList(displayListId);
-}
-void Floor::display() {
+    //glUseProgram(shaderProgram);
+    //glBindVertexArray(VAO);
+    //glDrawArrays(GL_TRIANGLES, 0, 4);
+    //glBindVertexArray(0);
 
-    btVector3 pos = tform.getOrigin();
-    // Set up and draw a rectangle GLmatrix
-    glPushMatrix();
-    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
-    glTranslated(pos.getX(), pos.getY(), pos.getZ());
-    glRotatef(-90.0, 1, 0, 0);
-    glRectf(0 - width, 0 - depth, width, depth);
-    glPopMatrix();
 }
+
+GLfloat vertices[] = {
+    -10.5f,  0.5f, 1.0f, // Top-left
+     10.5f,  0.5f, 0.0f, // Top-right
+     10.5f, -0.5f, 0.0f, // Bottom-right
+    -10.5f, -0.5f, 1.0f, // Bottom-left
+};
+GLuint elements[] = {
+    0, 1, 2,
+    2, 3, 0
+};
 
 void Floor::create()
 {
-    // Creates the rendering block
-    // Modern GL creates a prerendered 'glList'
-    // For static meshes
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
-    displayListId = glGenLists(1);
-    glNewList(displayListId, GL_COMPILE);
-    GLfloat lightPosition[] = { 10, 3, 7, 1 };
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-    glBegin(GL_QUADS);
-    glVertex3f(-width, -depth, 12);
-    glVertex3f(width, -depth, 12);
-    glVertex3f(-width, depth, 12);
-    glVertex3f(-width, -depth, 12);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
-    glEnd();
-    glEndList();
+    GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+    glEnableVertexAttribArray(posAttrib);
+
+    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    
+    // Unbind the VAO, VBO, and EBO
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    // Create a shader (in modern gl this shader could apply to more objects, but for demo its fine here.)
+    unsigned int vertexShader;
+    vertexShader = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+    glCompileShader(vertexShader);
+    unsigned int fragmentShader;
+    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+    glCompileShader(fragmentShader);
+
+
+    shaderProgram = glCreateProgram();
+    glAttachShader(shaderProgram, vertexShader);
+    glAttachShader(shaderProgram, fragmentShader);
+    glLinkProgram(shaderProgram);
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+
 }
 
 void Floor::update() {
@@ -95,16 +138,6 @@ void Floor::update() {
     }
 }
 
-void Cube::display()
-{
-
-
-}
-
-void Triangles::setPosition(glm::vec3 xyz)
-{
-
-}
 
 glm::vec3 rotationaxis(0.0f, 1.0f, 0.0f);
 void Triangles::draw()

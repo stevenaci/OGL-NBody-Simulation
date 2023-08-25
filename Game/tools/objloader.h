@@ -1,5 +1,3 @@
-#ifndef OBJLOADER_H
-#define OBJLOADER_H
 
 bool loadOBJ(
 	const char* path,
@@ -8,4 +6,3 @@ bool loadOBJ(
 	std::vector<glm::vec3>& out_normals
 );
 
-#endif

@@ -17,8 +17,6 @@
 #include <deque>
 #include <vector>
 #include <bullet/btBulletDynamicsCommon.h>
-#include "Mesh.h"
-// Mesh
 
 #define WIDTH 1600
 #define HEIGHT 1200
@@ -53,7 +51,7 @@ Ball balls[] = {
   Ball(1.5, GREEN, 0, 20, 10.f),
   Ball(0.4, WHITE, 0, 30, 10.f)
 };
-Mesh mesh = Mesh();
+
 // Mouse Tracking
 int inwindow(int x, int y)
 {
@@ -63,8 +61,6 @@ int inwindow(int x, int y)
 void mouse_motion(int x, int y)
 {
     engine->camera->mouseUpdate(glm::vec2(x, y));
-    //std::cout << "Mouse update";
-    triangles.setPosition(engine->camera->position);
 }
 
 // Application-specific initialization: Set up global lighting parameters
@@ -79,7 +75,9 @@ void init() {
     glEnable(GL_LIGHT0);
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
+    glewInit();
     groundfloor.create();
+    //mesh.create();
 }
 
 // Return a random float in the range 0.0 to 1.0.
@@ -120,7 +118,7 @@ void update() {
     }
     if (it % 4 == 0) {
         it = 0;
-        rain.push_back(std::make_unique<Rain>(10 * randomFloat(), 30 * randomFloat(), 10 * randomFloat(), MAGENTA));
+        rain.push_back(std::make_unique<Rain>(randomFloat(),  randomFloat(), randomFloat(), RED));
     }
     rain.erase(std::remove(begin(rain), end(rain), nullptr),
         end(rain));
@@ -130,8 +128,9 @@ void update() {
 // Draws one frame of our scene from the current camera
 // position.
 void display() {
-    // Dark blue background
+
     engine->pre_display();
+    groundfloor.draw();
 
     for (auto& r : rain)
     {
@@ -139,30 +138,20 @@ void display() {
             r->display();
     }
 
-
     // Draws the fish bitmaps
     for (int i = 0; i < 20; i++) {
         glColor3f(randomFloat() * (i + 1), randomFloat() * (i + 1), randomFloat());
         glRasterPos3f(randomFloat() * (i + 1), randomFloat() * (i + 1), 0.0);
         glBitmap(27, 11, 0, 0, 0, 0, fish);
     }
-
-    groundfloor.display(); // immediate buffering
     
-                           
     for (int i = 0; i < sizeof balls / sizeof(Ball); i++) {
         balls[i].display();
     }
-    triangles.draw();
 
     glFlush();
     glutSwapBuffers();
 }
-
-GLubyte red_yel[][3] = {
-    red, yellow,
-    yellow, red,
-};
 
 // On reshape, constructs a camera that perfectly fits the window.
 void reshape(GLint w, GLint h) {
@@ -189,16 +178,25 @@ void timer(int v) {
 // display.
 void special(int key, int, int) {
     switch (key) {
-    case GLUT_KEY_LEFT: engine->camera->strafeLeft(); break;
-    case GLUT_KEY_RIGHT: engine->camera->strafeRight(); break;
-    case GLUT_KEY_UP: engine->camera->moveForward(); break;
-    case GLUT_KEY_DOWN: engine->camera->moveBackward(); break;
+        case GLUT_KEY_LEFT: engine->camera->strafeLeft(); break;
+        case GLUT_KEY_RIGHT: engine->camera->strafeRight(); break;
+        case GLUT_KEY_UP: engine->camera->moveForward(); break;
+        case GLUT_KEY_DOWN: engine->camera->moveBackward(); break;
     }
     glutPostRedisplay();
 }
 
+void keyboard(unsigned char key, int x, int y)
+{
+    switch (key) {
+        case 'w': engine->camera->moveUp(); break;
+        case 's': engine->camera->moveDown(); break;
+    }
+}
+
 // Initializes GLUT and enters the main loop.
 int main(int argc, char** argv) {
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowPosition(80, 80);
@@ -211,6 +209,7 @@ int main(int argc, char** argv) {
     //glutPassiveMotionFunc();
     glutReshapeFunc(reshape);
     glutSpecialFunc(special);
+    glutKeyboardFunc(keyboard);
     glutTimerFunc(100, timer, 0);
     init();
     glutMainLoop();

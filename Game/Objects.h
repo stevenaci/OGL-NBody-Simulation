@@ -20,7 +20,7 @@ struct vertex
 };
 
 class Floor {
-    int displayListId;
+
     btTransform tform;
     int width;
     int depth;
@@ -29,13 +29,16 @@ class Floor {
     btVector3 origin;
 
 public:
+    unsigned int VBO;
+    unsigned int VAO;
+    unsigned int EBO;
+    unsigned int shaderProgram;
     Floor(int width, int depth);
     double centerx();
     double centerz();
     void create();
     void update();
     void draw();
-    void display();
 };
 class Rain
 {
@@ -75,12 +78,8 @@ public:
     { 
         scale = { 0.0f, 1.0f, 0.0f }; 
         origin = { x, y, z };
-    
-
     }
-    void setPosition(glm::vec3 xyz);
-    void create() {}
-
+    void create() {};
     void draw();
 };
 
@@ -120,14 +119,4 @@ public:
     void update() {
 
     }
-};
-
-
-// Textured Cube,
-// binding & buffers :
-// (ogl 3.1)
-class Cube {
-public:
-    Cube() {};
-    void display();
 };

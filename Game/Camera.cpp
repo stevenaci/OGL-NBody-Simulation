@@ -4,27 +4,26 @@
 
 Camera::Camera() :
 	viewDirection(0.0, 0.0, -5.0),
-	UP(0.0f, 1.0f, 0.0f), position(2.0, 12.0, 0.0)
+	UP(0.0f, 1.0f, 0.0f), position(15.0, 15.0, 0.0)
 {
+
 }
 
 void Camera::mouseUpdate(const glm::vec2& newMousePosition) {
 	glm::vec2 mouseDelta = newMousePosition - oldMousePosition;
 
+	oldMousePosition = newMousePosition;
+
 	if (glm::length(mouseDelta) > 10.0f)
 	{
-		oldMousePosition = newMousePosition;
 		return;
 	}
-	const float ROTATIONAL_SPEED = 0.2;
+	const float ROTATIONAL_SPEED = 0.02;
 	glm::vec3 toRotateAround = glm::cross(viewDirection, UP);
 	glm::mat4 rotator = glm::rotate(-mouseDelta.x * ROTATIONAL_SPEED, UP) *
 		glm::rotate(-mouseDelta.y * ROTATIONAL_SPEED, toRotateAround);
 
 	viewDirection = glm::mat3(rotator) * viewDirection;
-
-	std::cout << "\n camera direction:" << viewDirection.x << ":" << viewDirection.y << ":" << viewDirection.z << "\n";
-	oldMousePosition = newMousePosition;
 }
 
 glm::mat4 Camera::getWorldToViewMatrix()
