@@ -40,6 +40,7 @@ void Rain::display()
         body->getMotionState()->getWorldTransform(tform);
     }
     btVector3 pos = tform.getOrigin();
+    
     // Set up and draw a sphere
     glPushMatrix();
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
@@ -138,8 +139,8 @@ void Floor::update() {
     }
 }
 
-
 glm::vec3 rotationaxis(0.0f, 1.0f, 0.0f);
+
 void Triangles::draw()
 {
     // Draw a textured triangle

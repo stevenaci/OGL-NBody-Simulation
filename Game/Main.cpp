@@ -101,28 +101,29 @@ GLubyte fish[] = {
   0x00, 0x0f, 0x00, 0xe0,
 };
 
-int it = 0; // Simple seed counter for generating rain
 void update() {
 
     engine->update();
 
-    // Update/ Generate Rain
-    it++;
+    // Update Rain
+    static int it = 0; // counter for generating rain
     for (auto& r : rain)
     {
         r->update();
-        if (r->getLife() > r->getMaxLife())
-        {
-            r = nullptr;
-        }
     }
-    if (it % 4 == 0) {
+    rain.erase(
+        std::remove_if(rain.begin(), rain.end(), [](const std::unique_ptr<Rain>& r) {
+            return r->getLife() > r->getMaxLife();
+            }),
+        rain.end()
+    );
+    it++;
+    if (it % 10 == 0) {
         it = 0;
         rain.push_back(std::make_unique<Rain>(randomFloat(),  randomFloat(), randomFloat(), RED));
     }
-    rain.erase(std::remove(begin(rain), end(rain), nullptr),
-        end(rain));
-    groundfloor.update();
+
+    // groundfloor.update();
 }
 
 // Draws one frame of our scene from the current camera
