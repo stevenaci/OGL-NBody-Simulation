@@ -11,13 +11,11 @@ public:
 	glm::vec3 viewDirection;
 	glm::vec2 oldMousePosition;
 	const glm::vec3 UP;
-
 	float ms = 0.20f;
 	Camera();
 	void mouseUpdate(const glm::vec2& newMousePosition);
 	
 	glm::mat4 getWorldToViewMatrix();
-
 
 	void moveBackward();
 	void strafeLeft();

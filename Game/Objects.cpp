@@ -55,26 +55,29 @@ Floor::Floor(int width, int depth) : VBO(), VAO(), EBO(), shaderProgram(), width
 
     // position vector    
     origin = btVector3(0, -5, 0);
-    // shape vector
-    //btVector3 shape = btVector3(btScalar(width), btScalar(1.), btScalar(depth));
+    GLfloat color[] = { 0,0.5,0.5 };
     btVector3 shape = btVector3(btScalar(width), btScalar(1.), btScalar(depth));
 
     // Add to Physics World
     body = Engine::Instance()->createGround(origin, shape);
 
     // Colours
-    color[0] = 0.5;
-    color[1] = 0.71;
-    color[2] = 0.1;
+
 
 }
 
 void Floor::draw()
 {
-    //glUseProgram(shaderProgram);
-    //glBindVertexArray(VAO);
-    //glDrawArrays(GL_TRIANGLES, 0, 4);
-    //glBindVertexArray(0);
+    // Set up and draw a rectangle
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color);
+    glColor3f(0.0f, 0.5f, 0.5f);
+    //glTranslated(centerx(), 1, centerz());
+    glBegin(GL_QUADS);
+    glVertex2f(-0.5f, -0.5f);  // Bottom-left vertex
+    glVertex2f(0.5f, -0.5f);   // Bottom-right vertex
+    glVertex2f(0.5f, 0.5f);    // Top-right vertex
+    glVertex2f(-0.5f, 0.5f);   // Top-left vertex
+    glEnd();
 
 }
 
@@ -163,3 +166,4 @@ void Triangles::draw()
     glDisable(GL_TEXTURE_2D);
 
 }
+

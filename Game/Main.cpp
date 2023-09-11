@@ -1,7 +1,9 @@
-// This application shows balls bouncing on a checkerboard, with no respect
-// for the laws of Newtonian Mechanics.  There's a little spotlight to make
-// the animation interesting, and arrow keys move the camera for even more
-// fun.
+// This application shows balls falling on a plane,
+// with a physics simulation.
+// 
+// It demonstrates some basic GL 2.0, GLEW features. 
+//
+
 #include <GL/glew.h>
 #ifdef __APPLE_CC__
 #include <GLUT/glut.h>
@@ -39,18 +41,33 @@ GLfloat RED[] = { 1, 0, 0 };
 GLfloat GREEN[] = { 0, 1, 0 };
 GLfloat MAGENTA[] = { 1, 0, 1 };
 
-Engine* engine = Engine::Instance();
-
-// Global variables
+// Objects
+std::vector<std::unique_ptr<Rain>> rain;
 Floor groundfloor(18, 18);
 Triangles triangles(1, 1, 1);
-std::vector<std::unique_ptr<Rain>> rain;
 
 Ball balls[] = {
   Ball(1, GREEN, 0, 10, 10.f),
   Ball(1.5, GREEN, 0, 20, 10.f),
   Ball(0.4, WHITE, 0, 30, 10.f)
 };
+// A fish bitmap, size is 27x11, but all rows must have a multiple of 8 bits,
+// so we define it like it is 32x11.
+GLubyte fish[] = {
+  0x00, 0x60, 0x01, 0x00,
+  0x00, 0x90, 0x01, 0x00,
+  0x03, 0xf8, 0x02, 0x80,
+  0x1c, 0x37, 0xe4, 0x40,
+  0x20, 0x40, 0x90, 0x40,
+  0xc0, 0x40, 0x78, 0x80,
+  0x41, 0x37, 0x84, 0x80,
+  0x1c, 0x1a, 0x04, 0x80,
+  0x03, 0xe2, 0x02, 0x40,
+  0x00, 0x11, 0x01, 0x40,
+  0x00, 0x0f, 0x00, 0xe0,
+};
+
+Engine* engine = Engine::Instance();
 
 // Mouse Tracking
 int inwindow(int x, int y)
@@ -77,29 +94,12 @@ void init() {
     glDepthFunc(GL_LESS);
     glewInit();
     groundfloor.create();
-    //mesh.create();
 }
 
 // Return a random float in the range 0.0 to 1.0.
 GLfloat randomFloat() {
     return (GLfloat)rand() / RAND_MAX;
 }
-
-// A fish bitmap, size is 27x11, but all rows must have a multiple of 8 bits,
-// so we define it like it is 32x11.
-GLubyte fish[] = {
-  0x00, 0x60, 0x01, 0x00,
-  0x00, 0x90, 0x01, 0x00,
-  0x03, 0xf8, 0x02, 0x80,
-  0x1c, 0x37, 0xe4, 0x40,
-  0x20, 0x40, 0x90, 0x40,
-  0xc0, 0x40, 0x78, 0x80,
-  0x41, 0x37, 0x84, 0x80,
-  0x1c, 0x1a, 0x04, 0x80,
-  0x03, 0xe2, 0x02, 0x40,
-  0x00, 0x11, 0x01, 0x40,
-  0x00, 0x0f, 0x00, 0xe0,
-};
 
 void update() {
 
@@ -129,7 +129,6 @@ void update() {
 // Draws one frame of our scene from the current camera
 // position.
 void display() {
-
     engine->pre_display();
     groundfloor.draw();
 
@@ -181,8 +180,8 @@ void special(int key, int, int) {
     switch (key) {
         case GLUT_KEY_LEFT: engine->camera->strafeLeft(); break;
         case GLUT_KEY_RIGHT: engine->camera->strafeRight(); break;
-        case GLUT_KEY_UP: engine->camera->moveForward(); break;
-        case GLUT_KEY_DOWN: engine->camera->moveBackward(); break;
+        case GLUT_KEY_DOWN: engine->camera->moveForward(); break;
+        case GLUT_KEY_UP: engine->camera->moveBackward(); break;
     }
     glutPostRedisplay();
 }
